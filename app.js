@@ -22,6 +22,13 @@ UI.prototype.addBookToList = function(book) {
   bookList.appendChild(row);
 };
 
+// Delete book from list
+UI.prototype.deleteBook = function(target) {
+  if (target.className === "delete") {
+    target.parentElement.parentElement.remove();
+  }
+};
+
 // Show alert
 UI.prototype.showAlert = function(msg, className) {
   // Construct element
@@ -56,6 +63,7 @@ const form = document.getElementById("book-form"),
 
 // Event Listeners
 form.addEventListener("submit", addBook);
+bookList.addEventListener("click", deleteBook);
 
 // Functionality
 function addBook(e) {
@@ -83,4 +91,15 @@ function addBook(e) {
     // Clear input fields
     ui.clearFields();
   }
+}
+
+function deleteBook(e) {
+  e.preventDefault();
+
+  // Create UI instance
+  const ui = new UI();
+  // Run remove method
+  ui.deleteBook(e.target);
+  // Show alert
+  ui.showAlert("Book successfully removed from the list.", "success");
 }
