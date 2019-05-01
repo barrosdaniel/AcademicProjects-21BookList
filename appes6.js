@@ -40,7 +40,7 @@ class UI {
     // Insert alert element
     container.insertBefore(alertDiv, form);
     // Hide after 3s
-    setTimeout(function () {
+    setTimeout(function() {
       document.querySelector(".alert").remove();
     }, 3000);
   }
@@ -50,6 +50,48 @@ class UI {
     titleField.value = "";
     authorField.value = "";
     isbnField.value = "";
+  }
+}
+
+class Store {
+  static getBooks() {
+    let books;
+    if (localStorage.getItem("books") === null) {
+      books = [];
+    } else {
+      books = JSON.parse(localStorage.getItem("books"));
+    }
+
+    return books;
+  }
+
+  static displayBooks() {
+    const books = Store.getBooks();
+
+    books.forEach(function(book) {
+      const ui = new UI();
+
+      // Add book to UI
+      ui.addBookToList(book);
+    });
+  }
+
+  static addBook(book) {
+    const books = Store.getBooks();
+    books.push(book);
+    localStorage.setItem("books", JSON.stringify(books));
+  }
+
+  static removeBook(isbn) {
+    const books = Store.getBooks();
+
+    books.forEach(function(book, index) {
+      if (book.isbn === isbn) {
+        books.splice(index, 1);
+      }
+    });
+
+    localStorage.setItem("books", JSON.stringify(books));
   }
 }
 
@@ -64,6 +106,8 @@ const form = document.getElementById("book-form"),
 // Event Listeners
 form.addEventListener("submit", addBook);
 bookList.addEventListener("click", deleteBook);
+// DOM load event
+document.addEventListener("DOMContentLoaded", Store.displayBooks);
 
 // Functionality
 function addBook(e) {
@@ -86,6 +130,8 @@ function addBook(e) {
   } else {
     // Add book to list
     ui.addBookToList(book);
+    // Add book to local storage
+    Store.addBook(book);
     // Show success alert
     ui.showAlert("Book successfully added to the list.", "success");
     // Clear input fields
@@ -100,6 +146,8 @@ function deleteBook(e) {
   const ui = new UI();
   // Run remove method
   ui.deleteBook(e.target);
+  // Remove from Local Storage
+  Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
   // Show alert
   ui.showAlert("Book successfully removed from the list.", "success");
 }
